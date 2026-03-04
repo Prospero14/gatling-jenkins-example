@@ -29,10 +29,14 @@ pipeline {
     }
 
     stages {
-        // Шаг 1: Скачиваем твой код симуляций из репозитория на выбранный сервер
-        stage('Checkout') {
+        // Шаг 1: Скачиваем НЕ этот репозиторий с джобой, а репозиторий с твоими тестами Gatling!
+        stage('Checkout Gatling Tests') {
             steps {
-                checkout scm
+                // Jenkins зайдет в Bitbucket и скачает код самих симуляций
+                // Обязательно замени URL и credentialsId на свои реальные значения!
+                git branch: 'main', 
+                    url: 'https://bitbucket.org/твоя-компания/твой-репозиторий-с-тестами-gatling.git', 
+                    credentialsId: 'название-ключа-для-bitbucket' 
             }
         }
 
