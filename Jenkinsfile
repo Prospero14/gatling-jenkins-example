@@ -36,21 +36,12 @@ pipeline {
             }
         }
 
-        // Шаг 2: Непосредственно сам запуск (то, что ты вводил руками)
+        // Шаг 2: Непосредственно сам запуск
         stage('Run Gatling Tests') {
             steps {
                 echo "⏳ Запускаем симуляцию ${params.SIMULATION} на сервере ${params.TARGET_SERVER}..."
                 
-                // ВАЖНО: Судя по скриншоту, твой pom.xml лежит не в корне репозитория,
-                // а внутри папки "gatling/.maven/apache-maven-3.8.8/bin".
-                // Если ты загрузишь код в Bitbucket как есть, Jenkins должен будет зайти в эту папку:
-                
-                // dir('gatling/.maven/apache-maven-3.8.8/bin') {
-                //    // Если твой сервер-генератор на Windows, нужно писать bat вместо sh:
-                //    bat "mvn gatling:test -Dgatling.simulationClass=${params.SIMULATION}"
-                // }
-                
-                // Текущая команда по умолчанию (Для Linux-сервера и pom.xml в корне):
+                // Команда запуска для Linux серверов (где лежит pom.xml)
                 sh "mvn gatling:test -Dgatling.simulationClass=${params.SIMULATION}"
             }
         }
