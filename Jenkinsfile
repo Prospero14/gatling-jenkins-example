@@ -15,6 +15,10 @@ pipeline {
         // 2. ВЫБОР СИМУЛЯЦИИ
         // Это названия твоих симуляций (пакет.Класс)
         choice(name: 'SIMULATION', choices: ['simulations.Debug', 'simulations.FinmonWebSimulation', 'simulations.SberratingSimulation'], description: 'Выберите симуляцию для запуска')
+
+        // 3. ВЫБОР ВЕТКИ С ТЕСТАМИ
+        // По умолчанию будет качать main, но можно вписать любую ветку, например feature/new-scripts
+        string(name: 'TESTS_BRANCH', defaultValue: 'main', description: 'Ветка Bitbucket, из которой скачивать скрипты Gatling')
     }
 
     // Эти настройки памяти применятся на том сервере, который ты выбрал (заменяет твой export MAVEN_OPTS)
@@ -34,7 +38,7 @@ pipeline {
             steps {
                 // Jenkins зайдет в Bitbucket и скачает код самих симуляций
                 // Обязательно замени URL и credentialsId на свои реальные значения!
-                git branch: 'main', 
+                git branch: "${params.TESTS_BRANCH}", 
                     url: 'https://bitbucket.org/твоя-компания/твой-репозиторий-с-тестами-gatling.git', 
                     credentialsId: 'название-ключа-для-bitbucket' 
             }
