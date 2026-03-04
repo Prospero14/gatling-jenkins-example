@@ -13,8 +13,8 @@ pipeline {
         choice(name: 'TARGET_SERVER', choices: ['server-1', 'server-2', 'server-3'], description: 'Выберите сервер (генератор нагрузки) для запуска Gatling')
 
         // 2. ВЫБОР СИМУЛЯЦИИ
-        // Это названия твоих симуляций (классов в папке src/test/java/simulations)
-        choice(name: 'SIMULATION', choices: ['simulations.Debug', 'simulations.LoadTest', 'simulations.StressTest'], description: 'Выберите симуляцию для запуска')
+        // Это названия твоих симуляций (пакет.Класс)
+        choice(name: 'SIMULATION', choices: ['simulations.Debug', 'simulations.FinmonWebSimulation', 'simulations.SberratingSimulation'], description: 'Выберите симуляцию для запуска')
     }
 
     // Эти настройки памяти применятся на том сервере, который ты выбрал (заменяет твой export MAVEN_OPTS)
@@ -23,14 +23,13 @@ pipeline {
     }
 
     // Инструменты, которые должны быть установлены в Jenkins -> Global Tool Configuration
-    // Они автоматически скачаются/настроятся на нужном сервере, если их там нет.
     tools {
         maven 'Maven 3'
         jdk 'Java 17'
     }
 
     stages {
-        // Шаг 1: Скачиваем твой код симуляций из GitHub на выбранный сервер
+        // Шаг 1: Скачиваем твой код симуляций из репозитория на выбранный сервер
         stage('Checkout') {
             steps {
                 checkout scm
@@ -42,7 +41,16 @@ pipeline {
             steps {
                 echo "⏳ Запускаем симуляцию ${params.SIMULATION} на сервере ${params.TARGET_SERVER}..."
                 
-                // Команда запуска. Двойные кавычки нужны, чтобы ${...} превратилось в реальное значение (например, в simulations.Debug)
+                // ВАЖНО: Судя по скриншоту, твой pom.xml лежит не в корне репозитория,
+                // а внутри папки "gatling/.maven/apache-maven-3.8.8/bin".
+                // Если ты загрузишь код в Bitbucket как есть, Jenkins должен будет зайти в эту папку:
+                
+                // dir('gatling/.maven/apache-maven-3.8.8/bin') {
+                //    // Если твой сервер-генератор на Windows, нужно писать bat вместо sh:
+                //    bat "mvn gatling:test -Dgatling.simulationClass=${params.SIMULATION}"
+                // }
+                
+                // Текущая команда по умолчанию (Для Linux-сервера и pom.xml в корне):
                 sh "mvn gatling:test -Dgatling.simulationClass=${params.SIMULATION}"
             }
         }
