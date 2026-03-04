@@ -45,7 +45,7 @@ pipeline {
                 // Как раз то, что ты просил: сначала export MAVEN_OPTS, а потом mvn gatling:test с кавычками!
                 sh """
                     export MAVEN_OPTS="${env.MAVEN_OPTS}"
-                    mvn gatling:test -D"${params.SIMULATION}"
+                    mvn gatling:test -D"simulationClass=${params.SIMULATION}"
                 """
             }
         }
